@@ -134,15 +134,6 @@ npm run preview
 
 The build goes into the `dist/` folder - just upload that to any static hosting service!
 
-## Deploy to Vercel
-
-This is set up and ready for Vercel:
-
-1. Push to GitHub
-2. Import in Vercel
-3. Deploy!
-
-The `vercel.json` file is already configured to handle routing properly.
 
 ## A Few Notes
 
