@@ -117,3 +117,4 @@ export function JobCard({ job, onEdit, onArchive }: JobCardProps) {
   );
 }
 
+

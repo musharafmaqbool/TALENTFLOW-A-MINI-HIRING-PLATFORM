@@ -43,3 +43,4 @@ export function KanbanColumn({ id, title, candidates }: KanbanColumnProps) {
   );
 }
 
+
