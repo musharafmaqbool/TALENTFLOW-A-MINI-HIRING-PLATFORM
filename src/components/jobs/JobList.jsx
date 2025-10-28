@@ -180,20 +180,22 @@ export function JobList() {
               placeholder="Search jobs..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white shadow-sm transition-all"
+              className="w-full h-[48px] pl-11 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white shadow-sm transition-all"
             />
           </div>
 
-          <Select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            options={[
-              { value: 'all', label: '📋 All Status' },
-              { value: 'active', label: '✅ Active' },
-              { value: 'draft', label: '📝 Draft' },
-              { value: 'archived', label: '📦 Archived' },
-            ]}
-          />
+          <div className="flex items-center">
+            <Select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              options={[
+                { value: 'all', label: '📋 All Status' },
+                { value: 'active', label: '✅ Active' },
+                { value: 'draft', label: '📝 Draft' },
+                { value: 'archived', label: '📦 Archived' },
+              ]}
+            />
+          </div>
 
           {allTags.length > 0 && (
             <div className="flex flex-wrap gap-2">
