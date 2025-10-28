@@ -69,16 +69,23 @@ function generateEmail(firstName, lastName) {
 }
 
 export async function seedDatabase() {
-  // Check if already seeded
+  // Check if already seeded with the correct amount
   const jobCount = await db.jobs.count();
-  if (jobCount > 0) {
-    console.log('✅ Database already seeded');
+  const candidateCount = await db.candidates.count();
+  
+  // If we have data but not the expected amount, re-seed
+  if (jobCount > 0 && candidateCount >= 1000) {
+    console.log('✅ Database already seeded with 1000 candidates');
     return;
   }
-
-  console.log('🌱 Seeding database with fresh data...');
   
-  // Clear ALL existing data (in case of partial seed)
+  if (jobCount > 0 && candidateCount < 1000) {
+    console.log('🔄 Existing data found with fewer candidates. Re-seeding with 1000 candidates...');
+  } else {
+    console.log('🌱 Seeding database with fresh data...');
+  }
+  
+  // Clear ALL existing data (in case of partial seed or old data)
   await db.users.clear();
   await db.jobs.clear();
   await db.candidates.clear();
@@ -128,11 +135,14 @@ export async function seedDatabase() {
 
   await db.jobs.bulkAdd(jobs);
 
-  // Create 50 candidates (fast loading, perfect for demo)
+  // Create 1,000 candidates (optimized for fast loading)
   const candidates = [];
   const stageHistory = [];
   const activeJobs = jobs.filter(j => j.status === 'active');
-  for (let i = 0; i < 50; i++) {
+  
+  console.log('⏳ Creating 1,000 candidates...');
+  
+  for (let i = 0; i < 1000; i++) {
     const firstName = randomElement(FIRST_NAMES);
     const lastName = randomElement(LAST_NAMES);
     const job = randomElement(activeJobs);
@@ -179,22 +189,25 @@ export async function seedDatabase() {
     }
   }
 
+  console.log('⏳ Saving candidates to database...');
   await db.candidates.bulkAdd(candidates);
+  
+  console.log('⏳ Saving stage history to database...');
   await db.stageHistory.bulkAdd(stageHistory);
 
-  // Create 3 assessments with 6 questions each (fast, still impressive)
+  // Create 3 assessments with 12 questions each (meets 10+ requirement)
   const assessments = activeJobs.slice(0, 3).map((job, index) => ({
     id: `assessment-${index + 1}`,
     jobId: job.id,
     title: `${job.title} Assessment`,
-    description: `Assessment for ${job.title} position`,
+    description: `Comprehensive assessment for ${job.title} position`,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
     sections: [
       {
         id: `section-${index + 1}-1`,
         title: 'Technical Skills',
-        description: 'Evaluate your technical knowledge',
+        description: 'Evaluate your technical knowledge and expertise',
         order: 0,
         questions: [
           {
@@ -226,33 +239,82 @@ export async function seedDatabase() {
             id: `q-${index + 1}-4`,
             type: 'short-text',
             text: 'What is your current job title?',
-            required: false,
+            required: true,
             order: 3,
             maxLength: 100,
           },
           {
             id: `q-${index + 1}-5`,
             type: 'long-text',
-            text: 'Describe a challenging project you worked on.',
+            text: 'Describe a challenging project you worked on and your role in it.',
             required: true,
             order: 4,
             maxLength: 500,
+          },
+          {
+            id: `q-${index + 1}-6`,
+            type: 'single-choice',
+            text: 'What is your highest level of education?',
+            required: true,
+            order: 5,
+            options: ['High School', 'Associate Degree', 'Bachelor\'s Degree', 'Master\'s Degree', 'PhD'],
+          },
+          {
+            id: `q-${index + 1}-7`,
+            type: 'multi-choice',
+            text: 'Which development methodologies have you worked with?',
+            required: false,
+            order: 6,
+            options: ['Agile', 'Scrum', 'Kanban', 'Waterfall', 'DevOps', 'CI/CD'],
           },
         ],
       },
       {
         id: `section-${index + 1}-2`,
-        title: 'Work Preferences',
-        description: 'Tell us about your work preferences',
+        title: 'Work Preferences & Availability',
+        description: 'Tell us about your work preferences and availability',
         order: 1,
         questions: [
           {
-            id: `q-${index + 1}-6`,
+            id: `q-${index + 1}-8`,
             type: 'single-choice',
             text: 'Are you open to remote work?',
             required: true,
             order: 0,
-            options: ['Yes', 'No', 'Hybrid preferred'],
+            options: ['Yes, remote only', 'No, on-site only', 'Hybrid preferred', 'Flexible'],
+          },
+          {
+            id: `q-${index + 1}-9`,
+            type: 'short-text',
+            text: 'What is your expected salary range?',
+            required: false,
+            order: 1,
+            maxLength: 100,
+          },
+          {
+            id: `q-${index + 1}-10`,
+            type: 'numeric',
+            text: 'How many weeks notice do you need to give your current employer?',
+            required: true,
+            order: 2,
+            min: 0,
+            max: 12,
+          },
+          {
+            id: `q-${index + 1}-11`,
+            type: 'single-choice',
+            text: 'Are you legally authorized to work in this country?',
+            required: true,
+            order: 3,
+            options: ['Yes', 'No', 'Require sponsorship'],
+          },
+          {
+            id: `q-${index + 1}-12`,
+            type: 'long-text',
+            text: 'Why are you interested in this position?',
+            required: true,
+            order: 4,
+            maxLength: 500,
           },
         ],
       },
@@ -263,9 +325,9 @@ export async function seedDatabase() {
 
   console.log('✅ Database seeded successfully!');
   console.log(`📋 ${jobs.length} jobs (16 active, 5 draft, 4 archived)`);
-  console.log(`👥 ${candidates.length} candidates across all stages`);
-  console.log(`📝 ${assessments.length} assessments with 6 questions each`);
+  console.log(`👥 ${candidates.length} candidates randomly assigned to jobs and stages`);
+  console.log(`📝 ${assessments.length} assessments with 12 questions each (10+ requirement met)`);
   console.log(`📊 ${stageHistory.length} stage history records`);
-  console.log(`⚡ Lightning-fast loading!`);
+  console.log(`🚀 Optimized for fast loading with bulk operations!`);
 }
 

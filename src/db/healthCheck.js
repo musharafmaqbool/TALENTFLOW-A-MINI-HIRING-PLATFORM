@@ -8,7 +8,7 @@ export async function checkDatabaseHealth() {
     const stageHistoryCount = await db.stageHistory.count();
 
     const health = {
-      isHealthy: jobCount >= 25 && candidateCount >= 40 && assessmentCount >= 3,
+      isHealthy: jobCount >= 25 && candidateCount >= 1000 && assessmentCount >= 3,
       data: {
         jobs: jobCount,
         candidates: candidateCount,
@@ -17,8 +17,8 @@ export async function checkDatabaseHealth() {
       },
       expectedData: {
         jobs: '25',
-        candidates: '50',
-        assessments: '3',
+        candidates: '1000',
+        assessments: '3 (with 12 questions each)',
       },
     };
 
