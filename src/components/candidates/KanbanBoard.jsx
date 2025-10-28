@@ -57,7 +57,14 @@ export function KanbanBoard() {
     if (!over) return;
 
     const candidateId = active.id;
-    const newStage = over.id;
+    let newStage = over.id;
+
+    // Check if we dropped on a candidate (instead of a column)
+    // If so, find the stage of that candidate
+    const overCandidate = candidates.find(c => c.id === over.id);
+    if (overCandidate) {
+      newStage = overCandidate.currentStage;
+    }
 
     const candidate = candidates.find(c => c.id === candidateId);
     
